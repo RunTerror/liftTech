@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:tech/api/model/product_model.dart';
 import 'package:tech/api/products_repositry.dart';
 
@@ -9,6 +8,16 @@ import 'package:tech/api/products_repositry.dart';
 enum Filters {title, name, price}
 
 class ProductProvider extends ChangeNotifier {
+
+  bool _refreshed=false;
+  bool get refreshed=> _refreshed;
+
+
+  void updaterefresh(){
+    _refreshed=true;
+    notifyListeners();
+  }
+
   final ProductRepositry productRepositry = ProductRepositry();
 
   bool _isLoading = false;
@@ -22,13 +31,7 @@ class ProductProvider extends ChangeNotifier {
   List<ProductModel> _productmodel = [];
   List<ProductModel> get productmodel => _productmodel;
 
-  // Status _loadmorestatus = Status.stable;
-  // getLoadmoreStatus() => _loadmorestatus;
-
-  // setLoadingstatus(Status status) {
-  //   _loadmorestatus=status;
-  //   notifyListeners();
-  // }
+  
 
   String filter = '';
 
@@ -49,6 +52,7 @@ class ProductProvider extends ChangeNotifier {
     if (products != null) {
       _productmodel.addAll(products);
       _filtered.addAll(products);
+      _refreshed=false;
       log('${products.length}');
       notifyListeners();
     }

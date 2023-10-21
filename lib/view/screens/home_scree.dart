@@ -1,6 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tech/View%20Model/products_provider.dart';
 import 'package:tech/view/widgets/product_grid.dart';
 
@@ -15,10 +17,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _cateogryController = TextEditingController();
 
   final ScrollController _scrollController = ScrollController();
+   int offset = 0;
 
   @override
   void initState() {
-    int offset = 0;
+   
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Provider.of<ProductProvider>(context, listen: false)
@@ -47,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     return Scaffold(
-        backgroundColor: Colors.grey,
+        backgroundColor: const Color.fromARGB(255, 209, 182, 182),
         appBar: AppBar(
           leading: const Row(
             children: [
@@ -70,21 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           actions: [
-            const Icon(Icons.notifications),
+            IconButton(onPressed: () {
+              provider.productmodel.isNotEmpty? null:  provider.updaterefresh();
+              Provider.of<ProductProvider>(context,listen: false)
+          .fetchproducts(offset);
+          
+            },icon: const Icon(Icons.refresh)),
             PopupMenuButton<Filters>(
               tooltip: 'Cateogry',
               initialValue: selectedMenu,
               onSelected: (Filters item) {
-                print(item);
+                log('$item');
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Filters>>[
-                PopupMenuItem<Filters>(
-                  onTap: () {
-                    provider.updatefilter('Name');
-                  },
-                  value: Filters.name,
-                  child: const Text('Name'),
-                ),
                 PopupMenuItem<Filters>(
                   onTap: () {
                     provider.updatefilter('Title');
@@ -99,6 +100,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   value: Filters.price,
                   child: const Text('Price'),
                 ),
+                PopupMenuItem<Filters>(
+                  onTap: () {
+                    provider.updatefilter('Name');
+                  },
+                  value: Filters.name,
+                  child: const Text('Name'),
+                )
               ],
             )
           ],
@@ -136,14 +144,42 @@ class _HomeScreenState extends State<HomeScreen> {
               top: 20 + h / 10,
               child: Container(
                   padding:
-                      const EdgeInsets.only(left: 20, right: 20, bottom: 200),
-                  height: h,
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  height: h/1.3,
                   width: w,
                   child: Consumer<ProductProvider>(
                     builder: (context, value, child) {
                       return Column(
                         children: [
-                          value.error==false?  value.productmodel.isEmpty?const Center(child: CircularProgressIndicator(),): Container():const Center(child: Text('Please check your internet connection'),),
+
+                          provider.refreshed?const Center(child: CircularProgressIndicator(),): Container(),
+
+
+
+
+                          value.error == false
+                              ? value.productmodel.isEmpty
+                                  ?  SizedBox(
+                                      height: h / 1.35,
+                                      child: GridView.builder(
+                                        shrinkWrap: true,
+                                        gridDelegate:
+                                           const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                          childAspectRatio: 2 / 3,
+                                        ),
+                                        itemBuilder: (context, index) {
+                                          return shimmer(w, h);
+                                        },
+                                      ),
+                                    )
+                                  : Container()
+                              :  Center(
+                                  child: value.productmodel.isNotEmpty?Container():const Text(
+                                      'Please check your internet connection'),
+                                ),
                           Expanded(
                             child: GridView.builder(
                               controller: _scrollController,
@@ -155,13 +191,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisSpacing: 10,
                                       childAspectRatio: 2 / 3),
                               itemBuilder: (context, index) {
-                                return productgrid(value.filtered[index], context);
+                                return productgrid(
+                                    value.filtered[index], context);
                               },
                             ),
                           ),
-                         value.productmodel.isEmpty? Container(): value.isLoading == true
-                              ? const CircularProgressIndicator()
-                              : Container() 
+                          value.productmodel.isEmpty
+                              ? Container()
+                              : value.isLoading == true
+                                  ? const CircularProgressIndicator()
+                                  : Container()
                         ],
                       );
                     },
@@ -171,5 +210,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
   }
 
-  
+  Widget shimmer(var w, var h) {
+    return SizedBox(
+      width: w / 2.2,
+      height: h / 3,
+      child: Shimmer.fromColors(
+          baseColor:const
+           Color.fromARGB(255, 58, 56, 56).withOpacity(0.25),
+          highlightColor: Colors.white.withOpacity(0.25),
+          child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            height: h / 2,
+            width: w / 2.2,
+          )),
+    );
+  }
 }

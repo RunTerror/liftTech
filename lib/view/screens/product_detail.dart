@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:card_swiper/card_swiper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tech/api/model/product_model.dart';
 
@@ -14,15 +13,12 @@ class ProductDetailedScreen extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           leadingWidth: 10,
           backgroundColor: const Color.fromARGB(255, 228, 223, 223),
           elevation: 0,
           title: const Text('Details'),
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(CupertinoIcons.back)),
+         
         ),
         body: Stack(
           alignment: Alignment.topCenter,
@@ -32,7 +28,7 @@ class ProductDetailedScreen extends StatelessWidget {
               width: w,
             ),
             Positioned(
-              top: 0, // Position the Swiper at the top
+              top: 0, 
               left: 0,
               right: 0,
               child: Container(
@@ -57,7 +53,7 @@ class ProductDetailedScreen extends StatelessWidget {
                   itemCount: productModel.images!.length,
                   pagination: const SwiperPagination(
                     alignment: Alignment.bottomCenter,
-                    // margin: EdgeInsets.only(right: 8.0, left: 8.0),
+                  
                     builder: DotSwiperPaginationBuilder(),
                   ),
                   control: const SwiperControl(),
@@ -67,7 +63,7 @@ class ProductDetailedScreen extends StatelessWidget {
             Positioned(
               top: h / 2 + 20,
               left: (w - w / 1.1) / 2,
-              child: Container(
+              child: SizedBox(
                 width: w / 1.1,
                 child: Column(
                   children: [

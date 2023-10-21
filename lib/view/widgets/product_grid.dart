@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tech/api/model/product_model.dart';
 import 'package:tech/view/screens/product_detail.dart';
 
 Widget productgrid(ProductModel productModel, BuildContext context) {
+
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(
@@ -18,22 +20,34 @@ Widget productgrid(ProductModel productModel, BuildContext context) {
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10), topRight: Radius.circular(10)),
-              child: CachedNetworkImage(
-                errorWidget: (context, url, error) {
-                  return const Center(
-                      child: SizedBox(
-                          height: 180,
-                          child: Icon(
-                            Icons.error,
-                            color: Colors.red,
-                          )));
-                },
-                imageUrl: productModel.images!.first,
+            Expanded(
+              child:
+               ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+                  child:  FractionallySizedBox(
+                // heightFactor: 0.99,
+                widthFactor: 1,
+                child:CachedNetworkImage(
+                    fadeInCurve: Curves.bounceIn,
+                    placeholder: (context, url) {
+                      return Shimmer.fromColors(baseColor: Colors.black, highlightColor: Colors.grey, child: Container());
+                    },
+                    filterQuality: FilterQuality.low,
+                    errorWidget: (context, url, error) {
+                      return const Center(
+                          child: SizedBox(
+                              height: 180,
+                              child: Icon(
+                                Icons.error,
+                                color: Colors.red,
+                              )));
+                    },
+                    imageUrl: productModel.images!.first,
+                ),),
               ),
             ),
             Padding(
@@ -70,5 +84,23 @@ Widget productgrid(ProductModel productModel, BuildContext context) {
           ],
         ),
       ),
+    );
+  }
+
+
+   Widget shimmer(var w, var h) {
+    return SizedBox(
+      width: w / 2.2,
+      height: h / 3,
+      child: Shimmer.fromColors(
+          baseColor:const Color.fromARGB(255, 58, 56, 56).withOpacity(0.25),
+          highlightColor: Colors.white.withOpacity(0.25),
+          child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            height: h / 2,
+            width: w / 2.2,
+          )),
     );
   }

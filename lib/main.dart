@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tech/View%20Model/products_provider.dart';
 import 'package:tech/view/screens/home_scree.dart';
-import 'package:tech/view/widgets/product_grid.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,9 +28,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const HomeScreen(),
-        // ),
       ),
     );
   }
 }
-
